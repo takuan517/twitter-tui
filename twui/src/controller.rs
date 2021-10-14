@@ -1,8 +1,4 @@
-use std::io::{Stdout, Write};
-use termion::clear;
-use termion::cursor;
 use termion::event::{Event, Key};
-use termion::raw::RawTerminal;
 
 enum Mode {
     Command,
@@ -11,17 +7,19 @@ enum Mode {
 }
 
 pub struct Controller {
-    stdout: RawTerminal<Stdout>,
+    renderer: Renderer,
     mode: Mode,
     command_buf: String,
+    insert_buf: String,
     pub exit: bool,
 }
 
 impl Controller {
-    pub fn new(stdout: RawTerminal<Stdout>) -> Controller {
+    pub fn new(renderer: Renderer) -> Controller {
         Controller {
-            stdout,
+            renderer,
             mode: Mode::Normal,
+            insert_buf: String::new(),
             command_buf: String::new(),
             exit: false,
         }
@@ -44,6 +42,9 @@ impl Controller {
                     Event::Key(Key::Char(i)) => {
                         self.command_buf.push(i);
                     },
+                    Event::Key(Key::Backspace) => {
+                        self.command_buf.pop(i);
+                    },
                     _ => {}
                 }
             },
@@ -52,7 +53,17 @@ impl Controller {
                     Event::Key(Key::Esc) => {
                         self.mode = Mode::Normal;
                     },
+                    Event::Key(Key::Ctrl('\n')) => {
+
+                        self.mode = Mode::Normal;
+                        self.insert_buf = String::new();
+                        //ツイート処理
+                    }
                     Event::Key(Key::Char(i)) => {
+                        self.insert_buf.push(i);
+                    },
+                    Event::Key(Key::Backspace) => {
+                        self.insert_buf.pop(i);
                     },
                     _ => {}
                 }
@@ -74,19 +85,19 @@ impl Controller {
         self
     }
     pub fn render(&mut self) -> () {
-        write!(self.stdout, "{}", clear::All);
-        write!(self.stdout, "{}", cursor::Goto(1,1));
+        self.renderer.reflesh();
+        self.renderer.clear();
         match self.mode {
             Mode::Command => {
-                write!(self.stdout, "CMD:{}", self.command_buf);
+                self.renderer.command_status(self.command_buf);
             },
             Mode::Insert => {
-                write!(self.stdout, "INS:");
+                self.renderer.insert_status(self.insert_buf);
             },
             Mode::Normal => {
-                write!(self.stdout, "NOR:");
+                self.renderer.normal_status();
             }
         }
-        self.stdout.flush().unwrap();
+        self.renderer.flush();
     } 
 }

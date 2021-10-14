@@ -10,7 +10,7 @@ use twui::controller::Controller;
 fn main() {
     let std_in = stdin();
     let mut std_out = stdout().into_raw_mode().unwrap();
-    let mut state = Controller::new(std_out);
+    let mut state = Controller::new(Renderer::new(std_out));
     for evt in std_in.events() {
         let c = evt.unwrap();
         state = state.input(c);
