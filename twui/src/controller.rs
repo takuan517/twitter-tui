@@ -14,6 +14,7 @@ pub struct Controller {
     command_buf: String,
     insert_buf: String,
     normal_buf: String,
+    repository: Repository,
     pub exit: bool,
 }
 
