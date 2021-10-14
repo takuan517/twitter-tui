@@ -7,12 +7,13 @@ use std::io::{stdin, stdout};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use twui::controller::Controller;
+use twui::ui::Renderer;
 
 
 fn main() {
     let std_in = stdin();
     let mut std_out = stdout().into_raw_mode().unwrap();
-    let mut state = Controller::new(std_out);
+    let mut state = Controller::new(Renderer::new(std_out));
     for evt in std_in.events() {
         state.render();
         let c = evt.unwrap();
