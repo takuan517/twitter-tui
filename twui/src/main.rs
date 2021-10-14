@@ -5,6 +5,7 @@ use std::io::{stdin, stdout};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use twui::controller::Controller;
+use twui::ui::Renderer;
 
 
 fn main() {
