@@ -14,6 +14,7 @@ pub struct Controller {
     stdout: RawTerminal<Stdout>,
     mode: Mode,
     command_buf: String,
+    repository: Repository,
     pub exit: bool,
 }
 

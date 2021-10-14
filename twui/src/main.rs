@@ -1,5 +1,7 @@
 extern crate twui;
 extern crate termion;
+extern crate chrono;
+extern crate chrono_tz;
 
 use std::io::{stdin, stdout};
 use termion::input::TermRead;
@@ -12,11 +14,11 @@ fn main() {
     let mut std_out = stdout().into_raw_mode().unwrap();
     let mut state = Controller::new(std_out);
     for evt in std_in.events() {
+        state.render();
         let c = evt.unwrap();
         state = state.input(c);
         if state.exit {
             return;
         }
-        state.render();
     }
 }
